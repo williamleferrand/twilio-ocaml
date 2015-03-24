@@ -11,29 +11,27 @@ let prep_pipeline account_sid auth_token pipeline =
   (* Prep for SSL *)
   Ssl.init ();
   let ctx = Ssl.create_context Ssl.TLSv1 Ssl.Client_context in
-  let tct = (Https_client.https_transport_channel_type ctx :> Http_client.transport_channel_type) in
-  pipeline#configure_transport Http_client.https_cb_id tct;
 
   (* Prep for authentication *)
   let key_handler =
     object
-      method inquire_key ~domain ~realms ~auth =
-        Http_client.key
+      method inquire_key ~domain ~realm ~auth =
+        Nethttp_client.key
           ~user:account_sid
           ~password:auth_token
-          ~realm:(List.hd realms)
-          ~domain
+          ~realm
+          ~domain:(match domain with None -> [] | Some domain -> [ domain ])
       method invalidate_key _key = ()
     end
   in
   let basic_auth_handler =
-    new Http_client.basic_auth_handler
-      ~enable_auth_in_advance:true
+    new Nethttp_client.basic_auth_handler
+      (* ~enable_auth_in_advance:true *)
       key_handler
   in
   let digest_auth_handler =
-    new Http_client.digest_auth_handler
-      ~enable_auth_in_advance:true
+    new Nethttp_client.digest_auth_handler
+      (* ~enable_auth_in_advance:true *)
       key_handler
   in
   pipeline#add_auth_handler basic_auth_handler;

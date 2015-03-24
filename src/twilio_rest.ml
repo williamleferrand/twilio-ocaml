@@ -9,7 +9,7 @@ module Make(A : sig
   val (>>=) : 'a _r -> ('a -> 'b _r) -> 'b _r
   val return : 'a -> 'a _r
   val account_sid : string
-  val send : Http_client.http_call -> http_call_result _r
+  val send : Nethttp_client.http_call -> http_call_result _r
 end) = struct
   module Request = Twilio_rest_request.Make(struct
     type 'a _r = 'a A._r
@@ -28,8 +28,8 @@ end) = struct
     http_call
 
   let send_delete url = failwith "TODO"
-  let send_get url = new Http_client.get url |> add_auth |> A.send
-  let send_post (url, args) = new Http_client.post url args |> add_auth |> A.send
+  let send_get url = new Nethttp_client.get url |> add_auth |> A.send
+  let send_post (url, args) = new Nethttp_client.post url args |> add_auth |> A.send
 
   let return of_string s =
     A.return (match s with

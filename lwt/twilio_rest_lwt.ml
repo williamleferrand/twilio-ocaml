@@ -1,7 +1,7 @@
 (** Module to help make Lwt enabled Twilio_rest modules.
   *)
 
-let set_event_system (pipeline : Http_client.pipeline) = pipeline#set_event_system
+let set_event_system (pipeline : Nethttp_client.pipeline) = pipeline#set_event_system
 
 module Make(A : sig
   val account_sid : string
@@ -41,18 +41,18 @@ end) = (struct
   end)
 
   let init ?(debug=false) synchronization connections esys =
-    let p = new Http_client.pipeline in
+    let p = new Nethttp_client.pipeline in
     Twilio_util.prep_pipeline A.account_sid A.auth_token p;
     pipeline := (Some p);
     p#set_options { p#get_options with
-                     Http_client.synchronization = Http_client.Pipeline synchronization;
-                     Http_client.number_of_parallel_connections = connections;
+                     Nethttp_client.synchronization = Nethttp_client.Pipeline synchronization;
+                     Nethttp_client.number_of_parallel_connections = connections;
                   };
 
     if debug then
       p#set_options
         { p#get_options with
-          Http_client.connection_timeout = 36000.0;
+          Nethttp_client.connection_timeout = 36000.0;
           verbose_status = true;
           verbose_request_header = true;
           verbose_request_contents = true;

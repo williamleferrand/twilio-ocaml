@@ -15,7 +15,7 @@ module Make : functor (A : sig
     (** The Twilio account SID, needed for URLs.  The auth_token is added
         into the request by send (or outside the module) *)
 
-  val send : Http_client.http_call -> Twilio_types.http_call_result _r
+  val send : Nethttp_client.http_call -> Twilio_types.http_call_result _r
     (** Send the http_call, return the result *)
 end) ->
 sig
